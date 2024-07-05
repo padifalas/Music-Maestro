@@ -598,8 +598,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00018310547, y: -438.39}
-  m_SizeDelta: {x: 0.00048828, y: -876.78}
+  m_AnchoredPosition: {x: 9.582581, y: -404.32996}
+  m_SizeDelta: {x: -84.905, y: -852.13}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1039077302
 MonoBehaviour:
@@ -657,13 +657,13 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
+  m_Spacing: 2
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
 --- !u!1 &1194631502
 GameObject:
@@ -1022,8 +1022,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.8342962}
   m_AnchorMax: {x: 0.9556668, y: 0.9314446}
-  m_AnchoredPosition: {x: 42.559998, y: -23.040009}
-  m_SizeDelta: {x: 85.12, y: 194.16}
+  m_AnchoredPosition: {x: 52.140015, y: -49}
+  m_SizeDelta: {x: 0.22, y: 174.99}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1684893064
 MonoBehaviour:
@@ -1081,13 +1081,13 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
+  m_Spacing: 2
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
 --- !u!1 &1854667521
 GameObject:
@@ -1273,6 +1273,14 @@ PrefabInstance:
       propertyPath: artworkImage
       value: 
       objectReference: {fileID: 2064838176}
+    - target: {fileID: 8353096226526529549, guid: 7c582589ef2d08e4088c5031abd1c512, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -1590
+      objectReference: {fileID: 0}
+    - target: {fileID: 8611688612196703240, guid: 7c582589ef2d08e4088c5031abd1c512, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

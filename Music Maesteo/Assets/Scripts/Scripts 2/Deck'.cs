@@ -9,13 +9,6 @@ public class Deck : MonoBehaviour
     public Transform aiHand;
     public GameObject cardPrefab;
 
-    void Start()
-    {
-        // Optionally shuffle and distribute at the start
-        //ShuffleDeck();
-         //DistributeInitialCards();
-    }
-
     public void ShuffleDeck()
     {
         deck = new List<Card>(allCards);
@@ -59,6 +52,7 @@ public class Deck : MonoBehaviour
         deck.RemoveAt(0);
 
         GameObject cardGO = Instantiate(cardPrefab, hand);
+        cardGO.transform.localScale = Vector3.one; // Ensure default scale
         CardDisplay cardDisplay = cardGO.GetComponent<CardDisplay>();
         if (cardDisplay != null)
         {
