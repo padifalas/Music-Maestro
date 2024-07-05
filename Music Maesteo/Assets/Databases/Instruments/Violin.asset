@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 1
   CardName: Violin
-  CardImage: {fileID: 0}
+  CardImage: {fileID: 21300000, guid: ac6819a579da7dd4b8648b06ef7bede7, type: 3}

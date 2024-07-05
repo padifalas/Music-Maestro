@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 1
   CardName: Guitar
-  CardImage: {fileID: 21300000, guid: 89788a7e84a140341a85b6a9b8b5ccd9, type: 3}
+  CardImage: {fileID: 21300000, guid: 8fb4dd123f2022248afeca89ea8a1afd, type: 3}
