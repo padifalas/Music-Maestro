@@ -18,9 +18,9 @@ public class DeckManager : MonoBehaviour
 
     void InitializeDeck()
     {
-        AddCardsToDeck(Card.CardType.Genre, genreSprites, 3); // 15 Genre Cards (3 of each type)
-        AddCardsToDeck(Card.CardType.Note, noteSprites, 4); // 28 Note Cards (4 of each type)
-        AddCardsToDeck(Card.CardType.Instrument, instrumentSprites, 3); // 12 Instrument Cards (3 of each type)
+        AddCardsToDeck(Card.CardType.Genre, genreSprites, 3); // 15 Genre Cards
+        AddCardsToDeck(Card.CardType.Note, noteSprites, 7); // 28 Note Cards
+        AddCardsToDeck(Card.CardType.Instrument, instrumentSprites, 3); // 12 Instrument Cards
         AddCardsToDeck(Card.CardType.Special, specialSprites, 1); // 4 Special Cards
         ShuffleDeck();
     }

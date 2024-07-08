@@ -14,7 +14,10 @@ public class GameManager : MonoBehaviour
     public TMP_Text playerScoreText;
     public TMP_Text aiScoreText;
 
+    public GameObject cardPrefab; // Drag your Card prefab here in the Inspector
+
     private List<Card> playerHand = new List<Card>();
+    private List<Card> aiHand = new List<Card>();
     private int playerScore = 0;
     private int aiScore = 0;
     private bool isPlayerTurn = true;
@@ -38,6 +41,7 @@ public class GameManager : MonoBehaviour
 
     void DealInitialCards()
     {
+        // Deal 6 cards to player
         playerHand = deckManager.DealCards(6);
         if (playerHand == null)
         {
@@ -45,22 +49,43 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        List<Card> aiHand = deckManager.DealCards(6);
+        // Deal 6 cards to AI
+        aiHand = deckManager.DealCards(6);
         if (aiHand == null)
         {
             Debug.LogError("Failed to deal AI cards.");
             return;
         }
 
-        foreach (var card in playerHand)
-        {
-            card.transform.SetParent(playerHandPanel);
-        }
+        LayoutPlayerCards(playerHand);
+        LayoutAICards(aiHand);
+    }
 
-        aiManager.aiHand.AddRange(aiHand);
-        foreach (var card in aiHand)
+    void LayoutPlayerCards(List<Card> cards)
+    {
+        float cardWidth = cardPrefab.GetComponent<RectTransform>().rect.width;
+        float spacing = 20f; // Adjust this value for spacing between cards
+        float startX = -(cards.Count - 1) * (cardWidth / 2 + spacing / 2);
+        for (int i = 0; i < cards.Count; i++)
         {
-            card.transform.SetParent(aiHandPanel);
+            RectTransform cardTransform = cards[i].GetComponent<RectTransform>();
+            cardTransform.SetParent(playerHandPanel);
+            cardTransform.localPosition = new Vector3(startX + i * (cardWidth + spacing), 0f, 0f);
+            cardTransform.localScale = Vector3.one;
+        }
+    }
+
+    void LayoutAICards(List<Card> cards)
+    {
+        float cardWidth = cardPrefab.GetComponent<RectTransform>().rect.width;
+        float spacing = 20f; // Adjust this value for spacing between cards
+        float startX = (cards.Count - 1) * (cardWidth / 2 + spacing / 2);
+        for (int i = 0; i < cards.Count; i++)
+        {
+            RectTransform cardTransform = cards[i].GetComponent<RectTransform>();
+            cardTransform.SetParent(aiHandPanel);
+            cardTransform.localPosition = new Vector3(startX - i * (cardWidth + spacing), 0f, 0f);
+            cardTransform.localScale = Vector3.one;
         }
     }
 
@@ -102,6 +127,10 @@ public class GameManager : MonoBehaviour
             if (isPlayer)
             {
                 playerHand.Remove(card);
+            }
+            else
+            {
+                aiHand.Remove(card);
             }
             Destroy(card.gameObject);
         }
