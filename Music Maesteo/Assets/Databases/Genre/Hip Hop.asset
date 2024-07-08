@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 129c3603deda69c44b0562143eb7256a, type: 3}
-  m_Name: Hip-Hop
+  m_Script: {fileID: 11500000, guid: d29dcec03049e09438eeb11f2af2190d, type: 3}
+  m_Name: Hip Hop
   m_EditorClassIdentifier: 
-  Type: 2
-  CardName: Hip-Hop
-  CardImage: {fileID: 21300000, guid: fc6d7e98ba042dc4eaa71624c51cf65e, type: 3}
+  cardName: Hip Hop
+  cardImage: {fileID: 21300000, guid: fc6d7e98ba042dc4eaa71624c51cf65e, type: 3}

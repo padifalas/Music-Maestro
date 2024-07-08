@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 129c3603deda69c44b0562143eb7256a, type: 3}
+  m_Script: {fileID: 11500000, guid: d29dcec03049e09438eeb11f2af2190d, type: 3}
   m_Name: Pop
   m_EditorClassIdentifier: 
-  Type: 2
-  CardName: Pop
-  CardImage: {fileID: 21300000, guid: c62d65d353d13e8459bec8c9f74deaad, type: 3}
+  cardName: Pop
+  cardImage: {fileID: 21300000, guid: c62d65d353d13e8459bec8c9f74deaad, type: 3}
