@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public Transform playerHandPanel;
     public Transform aiHandPanel;
     public Button shuffleButton;
+    public Button drawButton; // Button to draw a card from the deck
     public TMP_Text playerScoreText;
     public TMP_Text aiScoreText;
     public Image playerTurnIndicator; // UI element indicating player's turn
@@ -20,11 +21,13 @@ public class GameManager : MonoBehaviour
 
     private List<Card> playerHand = new List<Card>();
     private List<Card> aiHand = new List<Card>();
+    private List<Card> deck = new List<Card>(); // Deck of cards
     private int playerScore = 0;
     private int aiScore = 0;
     private bool isPlayerTurn = true;
 
     private bool gameStarted = false;
+    private bool shuffleButtonClicked = false; // Track if shuffle button is clicked
 
     void Awake()
     {
@@ -41,17 +44,47 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         shuffleButton.onClick.AddListener(StartGame);
+        drawButton.onClick.AddListener(DrawCard); // Listen for draw button click
         // Disable turn indicators initially
         playerTurnIndicator.gameObject.SetActive(false);
         aiTurnIndicator.gameObject.SetActive(false);
+        // Disable draw button initially
+        drawButton.interactable = false;
     }
 
     void StartGame()
     {
         // Initialize game setup
         DealInitialCards();
+        SetupDeck();
         gameStarted = true;
         StartNextTurn();
+        // Enable draw button after game starts and shuffle button is clicked
+        drawButton.interactable = shuffleButtonClicked;
+    }
+
+    void SetupDeck()
+    {
+        // Initialize deck with cards
+        deckManager.InitializeDeck();
+        deck = new List<Card>(deckManager.deck); // Copy the deck from DeckManager
+        ShuffleDeck();
+    }
+
+    void ShuffleDeck()
+    {
+        // Shuffle deck using Fisher-Yates algorithm
+        for (int i = 0; i < deck.Count; i++)
+        {
+            int randomIndex = Random.Range(i, deck.Count);
+            Card temp = deck[randomIndex];
+            deck[randomIndex] = deck[i];
+            deck[i] = temp;
+        }
+        // Set shuffleButtonClicked to true after shuffle
+        shuffleButtonClicked = true;
+        // Enable draw button after shuffle
+        drawButton.interactable = true;
     }
 
     void DealInitialCards()
@@ -78,13 +111,20 @@ public class GameManager : MonoBehaviour
 
     void LayoutPlayerCards(List<Card> cards)
     {
+        // Clear existing cards in the panel
+        foreach (Transform child in playerHandPanel)
+        {
+            Destroy(child.gameObject);
+        }
+
         float cardWidth = cardPrefab.GetComponent<RectTransform>().rect.width;
         float spacing = 20f; // Adjust this value for spacing between cards
         float startX = -(cards.Count - 1) * (cardWidth / 2 + spacing / 2);
         for (int i = 0; i < cards.Count; i++)
         {
-            RectTransform cardTransform = cards[i].GetComponent<RectTransform>();
-            cardTransform.SetParent(playerHandPanel);
+            Card card = Instantiate(cardPrefab, playerHandPanel).GetComponent<Card>();
+            card.Initialize(cards[i].cardType, cards[i].cardValue, cards[i].cardSprite);
+            RectTransform cardTransform = card.GetComponent<RectTransform>();
             cardTransform.localPosition = new Vector3(startX + i * (cardWidth + spacing), 0f, 0f);
             cardTransform.localScale = Vector3.one;
         }
@@ -92,13 +132,20 @@ public class GameManager : MonoBehaviour
 
     void LayoutAICards(List<Card> cards)
     {
+        // Clear existing cards in the panel
+        foreach (Transform child in aiHandPanel)
+        {
+            Destroy(child.gameObject);
+        }
+
         float cardWidth = cardPrefab.GetComponent<RectTransform>().rect.width;
         float spacing = 20f; // Adjust this value for spacing between cards
         float startX = (cards.Count - 1) * (cardWidth / 2 + spacing / 2);
         for (int i = 0; i < cards.Count; i++)
         {
-            RectTransform cardTransform = cards[i].GetComponent<RectTransform>();
-            cardTransform.SetParent(aiHandPanel);
+            Card card = Instantiate(cardPrefab, aiHandPanel).GetComponent<Card>();
+            card.Initialize(cards[i].cardType, cards[i].cardValue, cards[i].cardSprite);
+            RectTransform cardTransform = card.GetComponent<RectTransform>();
             cardTransform.localPosition = new Vector3(startX - i * (cardWidth + spacing), 0f, 0f);
             cardTransform.localScale = Vector3.one;
         }
@@ -211,6 +258,25 @@ public class GameManager : MonoBehaviour
         {
             playerTurnIndicator.gameObject.SetActive(false);
             aiTurnIndicator.gameObject.SetActive(true);
+        }
+    }
+
+    void DrawCard()
+    {
+        // Check if there are cards remaining in the deck
+        if (deck.Count > 0)
+        {
+            // Draw the top card from the deck
+            Card drawnCard = deck[0];
+            deck.RemoveAt(0); // Remove the card from the deck
+
+            // Add the drawn card to the player's hand
+            playerHand.Add(drawnCard);
+            LayoutPlayerCards(playerHand);
+        }
+        else
+        {
+            Debug.Log("No cards left in the deck.");
         }
     }
 }
