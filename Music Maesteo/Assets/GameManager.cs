@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
     public Button shuffleButton;
     public TMP_Text playerScoreText;
     public TMP_Text aiScoreText;
+    public Image playerTurnIndicator; // UI element indicating player's turn
+    public Image aiTurnIndicator;     // UI element indicating AI's turn
 
     public GameObject cardPrefab; // Drag your Card prefab here in the Inspector
 
@@ -21,6 +23,8 @@ public class GameManager : MonoBehaviour
     private int playerScore = 0;
     private int aiScore = 0;
     private bool isPlayerTurn = true;
+
+    private bool gameStarted = false;
 
     void Awake()
     {
@@ -36,7 +40,18 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        shuffleButton.onClick.AddListener(DealInitialCards);
+        shuffleButton.onClick.AddListener(StartGame);
+        // Disable turn indicators initially
+        playerTurnIndicator.gameObject.SetActive(false);
+        aiTurnIndicator.gameObject.SetActive(false);
+    }
+
+    void StartGame()
+    {
+        // Initialize game setup
+        DealInitialCards();
+        gameStarted = true;
+        StartNextTurn();
     }
 
     void DealInitialCards()
@@ -156,11 +171,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            isPlayerTurn = !isPlayerTurn;
-            if (!isPlayerTurn)
-            {
-                aiManager.TakeTurn();
-            }
+            StartNextTurn();
         }
     }
 
@@ -172,5 +183,34 @@ public class GameManager : MonoBehaviour
     void EndGame()
     {
         // Implement end game logic (e.g., display a win/loss message)
+    }
+
+    void StartNextTurn()
+    {
+        // Reset turn-specific variables
+        isPlayerTurn = !isPlayerTurn;
+        UpdateTurnIndicators();
+
+        if (!gameStarted)
+            return;
+
+        if (!isPlayerTurn)
+        {
+            aiManager.TakeTurn();
+        }
+    }
+
+    void UpdateTurnIndicators()
+    {
+        if (isPlayerTurn)
+        {
+            playerTurnIndicator.gameObject.SetActive(true);
+            aiTurnIndicator.gameObject.SetActive(false);
+        }
+        else
+        {
+            playerTurnIndicator.gameObject.SetActive(false);
+            aiTurnIndicator.gameObject.SetActive(true);
+        }
     }
 }
