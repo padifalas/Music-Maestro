@@ -10,24 +10,29 @@ public class GameManager : MonoBehaviour
     public AIManager aiManager;
     public Transform playerHandPanel;
     public Transform aiHandPanel;
+    public Transform discardPilePanel;
     public Button shuffleButton;
-    public Button drawButton; // Button to draw a card from the deck
+    public Button drawButton;
+    public Button discardButton; // Add discard button
     public TMP_Text playerScoreText;
     public TMP_Text aiScoreText;
-    public Image playerTurnIndicator; // UI element indicating player's turn
-    public Image aiTurnIndicator;     // UI element indicating AI's turn
-
-    public GameObject cardPrefab; // Drag your Card prefab here in the Inspector
+    public Image playerTurnIndicator;
+    public Image aiTurnIndicator;
+    public GameObject cardPrefab;
+    public GameObject discardPromptPanel;
 
     private List<Card> playerHand = new List<Card>();
     private List<Card> aiHand = new List<Card>();
-    private List<Card> deck = new List<Card>(); // Deck of cards
+    private List<Card> deck = new List<Card>();
+    private List<Card> discardPile = new List<Card>();
     private int playerScore = 0;
     private int aiScore = 0;
     private bool isPlayerTurn = true;
 
     private bool gameStarted = false;
-    private bool shuffleButtonClicked = false; // Track if shuffle button is clicked
+    private bool shuffleButtonClicked = false;
+    private bool isDiscardPromptActive = false;
+    private Card selectedCardToDiscard = null; // Track selected card to discard
 
     void Awake()
     {
@@ -44,36 +49,33 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         shuffleButton.onClick.AddListener(StartGame);
-        drawButton.onClick.AddListener(DrawCard); // Listen for draw button click
-        // Disable turn indicators initially
+        drawButton.onClick.AddListener(DrawCard);
+        discardButton.onClick.AddListener(OnDiscardButtonClicked); // Add listener for discard button
         playerTurnIndicator.gameObject.SetActive(false);
         aiTurnIndicator.gameObject.SetActive(false);
-        // Disable draw button initially
         drawButton.interactable = false;
+        discardButton.interactable = false; // Initially disable discard button
+        discardPromptPanel.SetActive(false);
     }
 
     void StartGame()
     {
-        // Initialize game setup
         DealInitialCards();
         SetupDeck();
         gameStarted = true;
         StartNextTurn();
-        // Enable draw button after game starts and shuffle button is clicked
         drawButton.interactable = shuffleButtonClicked;
     }
 
     void SetupDeck()
     {
-        // Initialize deck with cards
         deckManager.InitializeDeck();
-        deck = new List<Card>(deckManager.deck); // Copy the deck from DeckManager
+        deck = new List<Card>(deckManager.deck);
         ShuffleDeck();
     }
 
     void ShuffleDeck()
     {
-        // Shuffle deck using Fisher-Yates algorithm
         for (int i = 0; i < deck.Count; i++)
         {
             int randomIndex = Random.Range(i, deck.Count);
@@ -81,15 +83,12 @@ public class GameManager : MonoBehaviour
             deck[randomIndex] = deck[i];
             deck[i] = temp;
         }
-        // Set shuffleButtonClicked to true after shuffle
         shuffleButtonClicked = true;
-        // Enable draw button after shuffle
         drawButton.interactable = true;
     }
 
     void DealInitialCards()
     {
-        // Deal 6 cards to player
         playerHand = deckManager.DealCards(6);
         if (playerHand == null)
         {
@@ -97,7 +96,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Deal 6 cards to AI
         aiHand = deckManager.DealCards(6);
         if (aiHand == null)
         {
@@ -111,14 +109,13 @@ public class GameManager : MonoBehaviour
 
     void LayoutPlayerCards(List<Card> cards)
     {
-        // Clear existing cards in the panel
         foreach (Transform child in playerHandPanel)
         {
             Destroy(child.gameObject);
         }
 
         float cardWidth = cardPrefab.GetComponent<RectTransform>().rect.width;
-        float spacing = 20f; // Adjust this value for spacing between cards
+        float spacing = 20f;
         float startX = -(cards.Count - 1) * (cardWidth / 2 + spacing / 2);
         for (int i = 0; i < cards.Count; i++)
         {
@@ -127,19 +124,19 @@ public class GameManager : MonoBehaviour
             RectTransform cardTransform = card.GetComponent<RectTransform>();
             cardTransform.localPosition = new Vector3(startX + i * (cardWidth + spacing), 0f, 0f);
             cardTransform.localScale = Vector3.one;
+            card.GetComponent<Button>().onClick.AddListener(() => OnCardSelectedForDiscard(card)); // Add listener for card selection
         }
     }
 
     void LayoutAICards(List<Card> cards)
     {
-        // Clear existing cards in the panel
         foreach (Transform child in aiHandPanel)
         {
             Destroy(child.gameObject);
         }
 
         float cardWidth = cardPrefab.GetComponent<RectTransform>().rect.width;
-        float spacing = 20f; // Adjust this value for spacing between cards
+        float spacing = 20f;
         float startX = (cards.Count - 1) * (cardWidth / 2 + spacing / 2);
         for (int i = 0; i < cards.Count; i++)
         {
@@ -147,6 +144,24 @@ public class GameManager : MonoBehaviour
             card.Initialize(cards[i].cardType, cards[i].cardValue, cards[i].cardSprite);
             RectTransform cardTransform = card.GetComponent<RectTransform>();
             cardTransform.localPosition = new Vector3(startX - i * (cardWidth + spacing), 0f, 0f);
+            cardTransform.localScale = Vector3.one;
+        }
+    }
+
+    void LayoutDiscardPile()
+    {
+        foreach (Transform child in discardPilePanel)
+        {
+            Destroy(child.gameObject);
+        }
+
+        float offset = 5f;
+        for (int i = 0; i < discardPile.Count; i++)
+        {
+            Card discardedCard = Instantiate(cardPrefab, discardPilePanel).GetComponent<Card>();
+            discardedCard.Initialize(discardPile[i].cardType, discardPile[i].cardValue, discardPile[i].cardSprite);
+            RectTransform cardTransform = discardedCard.GetComponent<RectTransform>();
+            cardTransform.localPosition = new Vector3(0, -i * offset, 0);
             cardTransform.localScale = Vector3.one;
         }
     }
@@ -234,7 +249,6 @@ public class GameManager : MonoBehaviour
 
     void StartNextTurn()
     {
-        // Reset turn-specific variables
         isPlayerTurn = !isPlayerTurn;
         UpdateTurnIndicators();
 
@@ -263,20 +277,39 @@ public class GameManager : MonoBehaviour
 
     void DrawCard()
     {
-        // Check if there are cards remaining in the deck
         if (deck.Count > 0)
         {
-            // Draw the top card from the deck
             Card drawnCard = deck[0];
-            deck.RemoveAt(0); // Remove the card from the deck
-
-            // Add the drawn card to the player's hand
+            deck.RemoveAt(0);
             playerHand.Add(drawnCard);
             LayoutPlayerCards(playerHand);
+            discardButton.interactable = true; // Enable discard button after drawing a card
         }
         else
         {
             Debug.Log("No cards left in the deck.");
+        }
+    }
+
+    public void OnCardSelectedForDiscard(Card card)
+    {
+        selectedCardToDiscard = card;
+    }
+
+    public void OnDiscardButtonClicked()
+    {
+        if (selectedCardToDiscard != null)
+        {
+            playerHand.Remove(selectedCardToDiscard);
+            discardPile.Add(selectedCardToDiscard);
+            LayoutDiscardPile();
+            LayoutPlayerCards(playerHand);
+            discardButton.interactable = false; // Disable discard button after discarding a card
+            selectedCardToDiscard = null;
+        }
+        else
+        {
+            Debug.Log("No card selected to discard.");
         }
     }
 }

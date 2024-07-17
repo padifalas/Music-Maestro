@@ -14,7 +14,7 @@ public class AIManager : MonoBehaviour
         else
         {
             // Implement other AI strategies
-            // For example: draw a card, discard a card, etc.
+            // For example: draw a card, discard a card should be hereeee
         }
     }
 
